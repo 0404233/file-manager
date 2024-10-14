@@ -3,6 +3,9 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { chdir, cwd } from 'process';
 import { readdir, stat, readFile, writeFile, unlink, rename, copyFile } from 'fs/promises';
+import { createReadStream, createWriteStream } from 'fs';
+import { pipeline } from 'stream';
+import { createBrotliCompress, createBrotliDecompress } from 'zlib';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -170,6 +173,28 @@ const doCommand = async (input) => {
           console.log('Invalid input');
       }
       break;
+
+    case 'compress':
+      const [fileToCompress, compressedFile] = files;
+      pipeline(createReadStream(fileToCompress), createBrotliCompress(), createWriteStream(compressedFile), (err) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log(`File ${fileToCompress} compressed to ${compressedFile}`);
+        }
+      })
+      break;
+
+      case 'decompress':
+        const [compressFile, decompressFile] = files;
+        pipeline(createReadStream(compressFile), createBrotliDecompress(), createWriteStream(decompressFile), (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(`File ${compressFile} decompressed to ${decompressFile}`);
+          }
+        })
+        break;
 
     case '.exit':
       console.log(`Thank you for using File Manager, ${username}, goodbye!`);
