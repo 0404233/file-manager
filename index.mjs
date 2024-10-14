@@ -1,4 +1,4 @@
-import { homedir } from 'os';
+import { homedir, EOL, cpus } from 'os';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { chdir, cwd } from 'process';
@@ -43,7 +43,7 @@ const doCommand = async (input) => {
       chdir(upFolder);
       currentLocation = cwd();
       console.log(`You are currently in ${cwd()}`);
-    break;
+      break;
 
     case 'cd':
       const chooseFolder = files[0];
@@ -54,8 +54,8 @@ const doCommand = async (input) => {
       } catch {
         console.log('Invalid input');
       }
-    
-    break;
+
+      break;
 
     case 'ls':
       try {
@@ -68,7 +68,7 @@ const doCommand = async (input) => {
             type: format.isDirectory() ? 'directory' : 'file'
           };
         }));
-        
+
         formatOfFile.sort((a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name));
         formatOfFile.forEach(file => {
           console.log(`${file.name} : ${file.type}`);
@@ -76,7 +76,7 @@ const doCommand = async (input) => {
       } catch {
         console.log('Invalid input');
       }
-    
+
       break;
 
     case 'cat':
@@ -87,7 +87,7 @@ const doCommand = async (input) => {
         console.log('Invalid input');
       }
 
-    break;
+      break;
 
     case 'add':
       try {
@@ -97,7 +97,7 @@ const doCommand = async (input) => {
         console.log('Invalid input');
       }
 
-    break;
+      break;
 
     case 'rn':
       const [name, newName] = files;
@@ -108,7 +108,7 @@ const doCommand = async (input) => {
         console.log('Invalid input');
       }
 
-    break;
+      break;
 
     case 'cp':
       const [file, pathToCopy] = files;
@@ -118,8 +118,8 @@ const doCommand = async (input) => {
       } catch {
         console.log('Invalid input');
       }
-      
-    break;
+
+      break;
 
     case 'mv':
       const [fileMove, placeToMove] = files;
@@ -131,7 +131,7 @@ const doCommand = async (input) => {
         console.log('Invalid input');
       }
 
-    break;
+      break;
 
     case 'rm':
       try {
@@ -141,7 +141,35 @@ const doCommand = async (input) => {
         console.log('Invalid input');
       }
 
-    break;
+      break;
+
+    case 'os':
+      switch (files[0]) {
+        case '--EOL':
+          console.log(`EOL: ${JSON.stringify(EOL)}`);
+          break;
+
+        case '--cpus':
+          console.log(`Number of CPUs: ${cpus().length}`);
+          cpus().forEach(cpu => console.log(`CPU: ${cpu.model}, Speed: ${cpu.speed}`));
+          break;
+
+        case '--homedir':
+          console.log(`Home directory: ${homedir()}`);
+          break;
+
+        case '--username':
+          console.log(`Username: ${process.env.USERNAME}`);
+          break;
+
+        case '--architecture':
+          console.log(`Architecture: ${process.arch}`);
+          break;
+
+        default:
+          console.log('Invalid input');
+      }
+      break;
 
     case '.exit':
       console.log(`Thank you for using File Manager, ${username}, goodbye!`);
