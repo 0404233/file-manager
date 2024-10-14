@@ -1,8 +1,8 @@
 import { homedir } from 'os';
-import { dirname, join, parse } from 'path';
+import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { chdir, cwd } from 'process';
-import { readdir, stat } from 'fs/promises';
+import { readdir, stat, readFile, writeFile, unlink, rename, copyFile } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -78,6 +78,70 @@ const doCommand = async (input) => {
       }
     
       break;
+
+    case 'cat':
+      const showFile = files[0];
+      try {
+        console.log(await readFile(showFile, 'utf-8'));
+      } catch {
+        console.log('Invalid input');
+      }
+
+    break;
+
+    case 'add':
+      try {
+        await writeFile(join(currentLocation, files[0]), '');
+        console.log(`Add new file - ${files[0]}`)
+      } catch {
+        console.log('Invalid input');
+      }
+
+    break;
+
+    case 'rn':
+      const [name, newName] = files;
+      try {
+        await rename(name, newName);
+        console.log(`File ${name} rename to ${newName}`)
+      } catch {
+        console.log('Invalid input');
+      }
+
+    break;
+
+    case 'cp':
+      const [file, pathToCopy] = files;
+      try {
+        await copyFile(file, pathToCopy);
+        console.log(`File ${file} copied to ${pathToCopy}`);
+      } catch {
+        console.log('Invalid input');
+      }
+      
+    break;
+
+    case 'mv':
+      const [fileMove, placeToMove] = files;
+      try {
+        await copyFile(fileMove, placeToMove);
+        await unlink(fileMove);
+        console.log(`File ${fileMove} moved to ${placeToMove}`);
+      } catch {
+        console.log('Invalid input');
+      }
+
+    break;
+
+    case 'rm':
+      try {
+        await unlink(files[0]);
+        console.log(`${files[0]} delete.`);
+      } catch {
+        console.log('Invalid input');
+      }
+
+    break;
 
     case '.exit':
       console.log(`Thank you for using File Manager, ${username}, goodbye!`);
